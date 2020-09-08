@@ -1,0 +1,28 @@
+{
+	"name": "SourceDataset_dzb",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureSqlDatabase_CloudSales",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cw_table": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Copy_CloudSalesAzureSQL"
+		},
+		"annotations": [],
+		"type": "AzureSqlTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().cw_table",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

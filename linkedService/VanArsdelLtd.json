@@ -1,0 +1,16 @@
+{
+	"name": "VanArsdelLtd",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"annotations": [],
+		"type": "SqlServer",
+		"typeProperties": {
+			"connectionString": "integrated security=False;data source=137.135.229.167;initial catalog=OnPremRentals;user id=southridge",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4N2MwOTFhZi1mOTE5LTRmNWEtODQ0Yi00ODJkMTE4MTY3YjgiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "ironpremsqlserver",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

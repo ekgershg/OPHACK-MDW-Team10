@@ -1,0 +1,22 @@
+{
+	"name": "SourceDataset_fgc",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "FourthCoffee_Directory",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Copy_FourthCoffee"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "FileServerLocation",
+				"fileName": "*.csv",
+				"folderPath": "Rentals"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

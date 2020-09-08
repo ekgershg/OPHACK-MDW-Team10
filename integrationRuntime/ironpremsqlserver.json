@@ -1,0 +1,12 @@
+{
+	"name": "ironpremsqlserver",
+	"properties": {
+		"type": "SelfHosted",
+		"typeProperties": {
+			"linkedInfo": {
+				"resourceId": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/integrationRuntime",
+				"authorizationType": "Rbac"
+			}
+		}
+	}
+}

@@ -1,0 +1,18 @@
+{
+	"name": "FourthCoffee_Directory",
+	"type": "Microsoft.DataFactory/factories/linkedservices",
+	"properties": {
+		"description": "Password1234",
+		"annotations": [],
+		"type": "FileServer",
+		"typeProperties": {
+			"host": "C:\\",
+			"userId": "openhackadmin",
+			"encryptedCredential": "eyJDcmVkZW50aWFsSWQiOiI4YWRjNzhhNy04ZjJmLTRkMmYtYTg3Ny00NGM3ZmRkNTg0NTAiLCJWZXJzaW9uIjoiMi4wIiwiQ2xhc3NUeXBlIjoiTWljcm9zb2Z0LkRhdGFQcm94eS5Db3JlLkludGVyU2VydmljZURhdGFDb250cmFjdC5DcmVkZW50aWFsU1UwNkNZMTQifQ=="
+		},
+		"connectVia": {
+			"referenceName": "ircsvfiles",
+			"type": "IntegrationRuntimeReference"
+		}
+	}
+}

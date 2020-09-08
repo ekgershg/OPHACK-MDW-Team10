@@ -1,0 +1,22 @@
+{
+	"name": "DestinationDataset_ikj",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Copy_CosmosDBCollection"
+		},
+		"annotations": [],
+		"type": "Json",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "movies.json",
+				"fileSystem": "cosmosdbmovies"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

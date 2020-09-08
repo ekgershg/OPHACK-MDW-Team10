@@ -1,0 +1,28 @@
+{
+	"name": "SourceDataset_sw9",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "VanArsdelLtd",
+			"type": "LinkedServiceReference"
+		},
+		"parameters": {
+			"cw_table": {
+				"type": "String"
+			}
+		},
+		"folder": {
+			"name": "Copy_VanArsdelLtd"
+		},
+		"annotations": [],
+		"type": "SqlServerTable",
+		"schema": [],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": {
+				"value": "@dataset().cw_table",
+				"type": "Expression"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

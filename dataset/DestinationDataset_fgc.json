@@ -1,0 +1,21 @@
+{
+	"name": "DestinationDataset_fgc",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"folder": {
+			"name": "Copy_FourthCoffee"
+		},
+		"annotations": [],
+		"type": "Binary",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "fourthcoffeecsv"
+			}
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}
