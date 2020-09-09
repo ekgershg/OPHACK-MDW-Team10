@@ -19,6 +19,13 @@
 						"referenceName": "DimCustomers",
 						"type": "DataFlowReference"
 					},
+					"staging": {
+						"linkedService": {
+							"referenceName": "AzureDataLakeStorage_Team10",
+							"type": "LinkedServiceReference"
+						},
+						"folderPath": "1-sales-orders-with-details"
+					},
 					"compute": {
 						"coreCount": 8,
 						"computeType": "General"
