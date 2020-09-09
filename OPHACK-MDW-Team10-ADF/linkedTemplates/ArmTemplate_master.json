@@ -90,12 +90,6 @@
 					"CosmosDB_Movies_connectionString": {
 						"value": "[parameters('CosmosDB_Movies_connectionString')]"
 					},
-					"FourthCoffee_Directory_password": {
-						"value": "[parameters('FourthCoffee_Directory_password')]"
-					},
-					"VanArsdelLtd_connectionString": {
-						"value": "[parameters('VanArsdelLtd_connectionString')]"
-					},
 					"AzureDataLakeStorage_Team10_properties_typeProperties_url": {
 						"value": "[parameters('AzureDataLakeStorage_Team10_properties_typeProperties_url')]"
 					},
@@ -104,12 +98,6 @@
 					},
 					"ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId": {
 						"value": "[parameters('ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId')]"
-					},
-					"FourthCoffee_Directory_properties_typeProperties_host": {
-						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_host')]"
-					},
-					"FourthCoffee_Directory_properties_typeProperties_userId": {
-						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_userId')]"
 					}
 				}
 			},
@@ -128,6 +116,18 @@
 				"parameters": {
 					"factoryName": {
 						"value": "[parameters('factoryName')]"
+					},
+					"FourthCoffee_Directory_password": {
+						"value": "[parameters('FourthCoffee_Directory_password')]"
+					},
+					"VanArsdelLtd_connectionString": {
+						"value": "[parameters('VanArsdelLtd_connectionString')]"
+					},
+					"FourthCoffee_Directory_properties_typeProperties_host": {
+						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_host')]"
+					},
+					"FourthCoffee_Directory_properties_typeProperties_userId": {
+						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_userId')]"
 					}
 				}
 			},

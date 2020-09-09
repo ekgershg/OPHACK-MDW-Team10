@@ -23,14 +23,6 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'CosmosDB_Movies'"
 		},
-		"FourthCoffee_Directory_password": {
-			"type": "secureString",
-			"metadata": "Secure string for 'password' of 'FourthCoffee_Directory'"
-		},
-		"VanArsdelLtd_connectionString": {
-			"type": "secureString",
-			"metadata": "Secure string for 'connectionString' of 'VanArsdelLtd'"
-		},
 		"AzureDataLakeStorage_Team10_properties_typeProperties_url": {
 			"type": "string",
 			"defaultValue": "https://ophackmdwteam10stgacc.dfs.core.windows.net"
@@ -42,14 +34,6 @@
 		"ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId": {
 			"type": "string",
 			"defaultValue": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/integrationRuntime"
-		},
-		"FourthCoffee_Directory_properties_typeProperties_host": {
-			"type": "string",
-			"defaultValue": "C:\\"
-		},
-		"FourthCoffee_Directory_properties_typeProperties_userId": {
-			"type": "string",
-			"defaultValue": "openhackadmin"
 		}
 	},
 	"variables": {
@@ -141,6 +125,328 @@
 				}
 			},
 			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AddressesCloudSales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Addresses.parquet",
+						"fileSystem": "cloudsalesazuresql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "AddressID",
+						"type": "UTF8"
+					},
+					{
+						"name": "CustomerID",
+						"type": "UTF8"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "UTF8"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "UTF8"
+					},
+					{
+						"name": "City",
+						"type": "UTF8"
+					},
+					{
+						"name": "State",
+						"type": "UTF8"
+					},
+					{
+						"name": "ZipCode",
+						"type": "UTF8"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "DATE"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "DATE"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AddressesCloudStreaming')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Addresses.parquet",
+						"fileSystem": "cloudstreamingazuresql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustoimersCloudStreaming')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.parquet",
+						"fileSystem": "cloudstreamingazuresql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "UTF8"
+					},
+					{
+						"name": "LastName",
+						"type": "UTF8"
+					},
+					{
+						"name": "FirstName",
+						"type": "UTF8"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "UTF8"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "DATE"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "DATE"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerFourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"fileSystem": "fourthcoffeecsv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomersCloudSales')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.parquet",
+						"fileSystem": "cloudsalesazuresql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "UTF8"
+					},
+					{
+						"name": "LastName",
+						"type": "UTF8"
+					},
+					{
+						"name": "FirstName",
+						"type": "UTF8"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "UTF8"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "DATE"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "DATE"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomersWithAddresses')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "4-customers-with-addresses"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Customersvanarsdelsqlserver')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.parquet",
+						"fileSystem": "vanarsdelsqlserver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ActorName",
+						"type": "UTF8"
+					},
+					{
+						"name": "Gender",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/DestinationDataset_dzb')]",
@@ -394,269 +700,6 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/CosmosDB_Movies')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/SourceDataset_zc3')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureSqlDatabase_CloudStreaming",
-					"type": "LinkedServiceReference"
-				},
-				"parameters": {
-					"cw_table": {
-						"type": "String"
-					}
-				},
-				"folder": {
-					"name": "Copy_CloudStreamingAzureSQL"
-				},
-				"annotations": [],
-				"type": "AzureSqlTable",
-				"schema": [],
-				"typeProperties": {
-					"schema": "dbo",
-					"table": {
-						"value": "@dataset().cw_table",
-						"type": "Expression"
-					}
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureSqlDatabase_CloudStreaming')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/FourthCoffee_Directory')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"description": "Password1234",
-				"annotations": [],
-				"type": "FileServer",
-				"typeProperties": {
-					"host": "[parameters('FourthCoffee_Directory_properties_typeProperties_host')]",
-					"userId": "[parameters('FourthCoffee_Directory_properties_typeProperties_userId')]",
-					"password": {
-						"type": "SecureString",
-						"value": "[parameters('FourthCoffee_Directory_password')]"
-					}
-				},
-				"connectVia": {
-					"referenceName": "ircsvfiles",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/ircsvfiles')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/VanArsdelLtd')]",
-			"type": "Microsoft.DataFactory/factories/linkedServices",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"annotations": [],
-				"type": "SqlServer",
-				"typeProperties": {
-					"connectionString": "[parameters('VanArsdelLtd_connectionString')]"
-				},
-				"connectVia": {
-					"referenceName": "ironpremsqlserver",
-					"type": "IntegrationRuntimeReference"
-				}
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/integrationRuntimes/ironpremsqlserver')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CustomersCloudSales')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage_Team10",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Customers.parquet",
-						"fileSystem": "cloudsalesazuresql"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "CustomerID",
-						"type": "UTF8"
-					},
-					{
-						"name": "LastName",
-						"type": "UTF8"
-					},
-					{
-						"name": "FirstName",
-						"type": "UTF8"
-					},
-					{
-						"name": "PhoneNumber",
-						"type": "UTF8"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "DATE"
-					},
-					{
-						"name": "UpdatedDate",
-						"type": "DATE"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AddressesCloudSales')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage_Team10",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Addresses.parquet",
-						"fileSystem": "cloudsalesazuresql"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "AddressID",
-						"type": "UTF8"
-					},
-					{
-						"name": "CustomerID",
-						"type": "UTF8"
-					},
-					{
-						"name": "AddressLine1",
-						"type": "UTF8"
-					},
-					{
-						"name": "AddressLine2",
-						"type": "UTF8"
-					},
-					{
-						"name": "City",
-						"type": "UTF8"
-					},
-					{
-						"name": "State",
-						"type": "UTF8"
-					},
-					{
-						"name": "ZipCode",
-						"type": "UTF8"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "DATE"
-					},
-					{
-						"name": "UpdatedDate",
-						"type": "DATE"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/CustoimersCloudStreaming')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage_Team10",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Customers.parquet",
-						"fileSystem": "cloudstreamingazuresql"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": [
-					{
-						"name": "CustomerID",
-						"type": "UTF8"
-					},
-					{
-						"name": "LastName",
-						"type": "UTF8"
-					},
-					{
-						"name": "FirstName",
-						"type": "UTF8"
-					},
-					{
-						"name": "PhoneNumber",
-						"type": "UTF8"
-					},
-					{
-						"name": "CreatedDate",
-						"type": "DATE"
-					},
-					{
-						"name": "UpdatedDate",
-						"type": "DATE"
-					}
-				]
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
-			]
-		},
-		{
-			"name": "[concat(parameters('factoryName'), '/AddressesCloudStreaming')]",
-			"type": "Microsoft.DataFactory/factories/datasets",
-			"apiVersion": "2018-06-01",
-			"properties": {
-				"linkedServiceName": {
-					"referenceName": "AzureDataLakeStorage_Team10",
-					"type": "LinkedServiceReference"
-				},
-				"annotations": [],
-				"type": "Parquet",
-				"typeProperties": {
-					"location": {
-						"type": "AzureBlobFSLocation",
-						"fileName": "Addresses.parquet",
-						"fileSystem": "cloudstreamingazuresql"
-					},
-					"compressionCodec": "snappy"
-				},
-				"schema": []
-			},
-			"dependsOn": [
-				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
 			]
 		}
 	]
