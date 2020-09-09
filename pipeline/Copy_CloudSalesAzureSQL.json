@@ -126,6 +126,9 @@
 				]
 			}
 		},
+		"folder": {
+			"name": "Copy Pipelines"
+		},
 		"annotations": [],
 		"lastPublishTime": "2020-09-08T18:36:04Z"
 	},

@@ -1,0 +1,33 @@
+{
+	"name": "Customersvanarsdelsqlserver",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Customers.parquet",
+				"fileSystem": "vanarsdelsqlserver"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "ActorID",
+				"type": "UTF8"
+			},
+			{
+				"name": "ActorName",
+				"type": "UTF8"
+			},
+			{
+				"name": "Gender",
+				"type": "UTF8"
+			}
+		]
+	}
+}
