@@ -3,7 +3,7 @@
 	"properties": {
 		"activities": [
 			{
-				"name": "dataflow1",
+				"name": "CustWithAddres",
 				"type": "ExecuteDataFlow",
 				"dependsOn": [],
 				"policy": {
