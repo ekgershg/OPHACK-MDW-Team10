@@ -27,6 +27,10 @@
 			"type": "secureString",
 			"metadata": "Secure string for 'password' of 'FourthCoffee_Directory'"
 		},
+		"Team10Synapse_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'Team10Synapse'"
+		},
 		"VanArsdelLtd_connectionString": {
 			"type": "secureString",
 			"metadata": "Secure string for 'connectionString' of 'VanArsdelLtd'"
@@ -657,6 +661,139 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/Dataflow')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "Streaming Transactions",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "StreamingTransactions",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"StreamingTransactions": {},
+									"sinkStreamingTransactions": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/StreamingTransactions')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimCustomers",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimCustomers",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Customers": {},
+									"Team10Synapse": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "1-sales-orders-with-details"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimCustomers')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SalesOrderWithDetails')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "StreamingTransactions",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "StreamingTransactions",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"StreamingTransactions": {},
+									"sinkStreamingTransactions": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/StreamingTransactions')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/AddressesCloudSales')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -741,6 +878,27 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/AzureSynapseAnalyticsTable1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCustomers"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
 			]
 		},
 		{
@@ -1139,6 +1297,51 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCustomers"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SinkStreamingTransactions')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "2-streaming-transactions"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/SourceDataset_dzb')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1323,6 +1526,60 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/StreamingTransactions')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Transactions.parquet",
+						"fileSystem": "cloudstreamingazuresql"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "TransactionID",
+						"type": "UTF8"
+					},
+					{
+						"name": "CustomerID",
+						"type": "UTF8"
+					},
+					{
+						"name": "MovieID",
+						"type": "UTF8"
+					},
+					{
+						"name": "StreamStart",
+						"type": "INT96"
+					},
+					{
+						"name": "StreamEnd",
+						"type": "INT96"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "DATE"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "DATE"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/trgCustomersWithAddresses')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1426,6 +1683,19 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/integrationRuntimes/ircsvfiles')]"
 			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Team10Synapse')]",
+			"type": "Microsoft.DataFactory/factories/linkedServices",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"annotations": [],
+				"type": "AzureSqlDW",
+				"typeProperties": {
+					"connectionString": "[parameters('Team10Synapse_connectionString')]"
+				}
+			},
+			"dependsOn": []
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/VanArsdelLtd')]",
@@ -1588,6 +1858,88 @@
 				"[concat(variables('factoryId'), '/datasets/Customersvanarsdelsqlserver')]",
 				"[concat(variables('factoryId'), '/datasets/CustomerFourthCoffee')]",
 				"[concat(variables('factoryId'), '/datasets/trgCustomersWithAddresses')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "trgCustomersWithAddresses",
+								"type": "DatasetReference"
+							},
+							"name": "Customers"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "Team10Synapse"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DimCustomers"
+						},
+						{
+							"name": "DimCustomer"
+						},
+						{
+							"name": "CustomerSK"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate_Cust as date,\n\t\tUpdatedDate_Cust as date,\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate_Add as date,\n\t\tUpdatedDate_Add as date,\n\t\tSource as integer,\n\t\tUID as string,\n\t\tcrDate as string,\n\t\tupDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customers\nCustomers select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimCustomers\nDimCustomers derive(ActiveFlag = true(),\n\t\tRecordStartDate = currentDate()) ~> DimCustomer\nDimCustomer keyGenerate(output(CustomerSK as long),\n\tstartAt: 1L) ~> CustomerSK\nCustomerSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Team10Synapse"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/trgCustomersWithAddresses')]",
+				"[concat(variables('factoryId'), '/datasets/DimCustomers')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/StreamingTransactions')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "StreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingTransactions"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SinkStreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "sinkStreamingTransactions"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumnStreaming"
+						}
+					],
+					"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransactions\nStreamingTransactions derive(Source = 2,\n\t\tUID = uuid()) ~> DerivedColumnStreaming\nDerivedColumnStreaming sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkStreamingTransactions"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/StreamingTransactions')]",
+				"[concat(variables('factoryId'), '/datasets/SinkStreamingTransactions')]"
 			]
 		}
 	]
