@@ -1,0 +1,49 @@
+{
+	"name": "StreamingTransactions",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Transactions.parquet",
+				"fileSystem": "cloudstreamingazuresql"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "TransactionID",
+				"type": "UTF8"
+			},
+			{
+				"name": "CustomerID",
+				"type": "UTF8"
+			},
+			{
+				"name": "MovieID",
+				"type": "UTF8"
+			},
+			{
+				"name": "StreamStart",
+				"type": "INT96"
+			},
+			{
+				"name": "StreamEnd",
+				"type": "INT96"
+			},
+			{
+				"name": "CreatedDate",
+				"type": "DATE"
+			},
+			{
+				"name": "UpdatedDate",
+				"type": "DATE"
+			}
+		]
+	}
+}
