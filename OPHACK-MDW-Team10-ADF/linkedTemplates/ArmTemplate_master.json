@@ -1,0 +1,139 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "OPHACK-MDW-Team10-ADF"
+		},
+		"AzureDataLakeStorage_Team10_accountKey": {
+			"type": "secureString",
+			"metadata": "Secure string for 'accountKey' of 'AzureDataLakeStorage_Team10'"
+		},
+		"AzureSqlDatabase_CloudSales_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase_CloudSales'"
+		},
+		"AzureSqlDatabase_CloudStreaming_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'AzureSqlDatabase_CloudStreaming'"
+		},
+		"CosmosDB_Movies_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'CosmosDB_Movies'"
+		},
+		"FourthCoffee_Directory_password": {
+			"type": "secureString",
+			"metadata": "Secure string for 'password' of 'FourthCoffee_Directory'"
+		},
+		"VanArsdelLtd_connectionString": {
+			"type": "secureString",
+			"metadata": "Secure string for 'connectionString' of 'VanArsdelLtd'"
+		},
+		"AzureDataLakeStorage_Team10_properties_typeProperties_url": {
+			"type": "string",
+			"defaultValue": "https://ophackmdwteam10stgacc.dfs.core.windows.net"
+		},
+		"FourthCoffee_Directory_properties_typeProperties_host": {
+			"type": "string",
+			"defaultValue": "C:\\"
+		},
+		"FourthCoffee_Directory_properties_typeProperties_userId": {
+			"type": "string",
+			"defaultValue": "openhackadmin"
+		},
+		"ircsvfiles_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/IRCSV"
+		},
+		"ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId": {
+			"type": "string",
+			"defaultValue": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/integrationRuntime"
+		},
+		"containerUri": {
+			"type": "string",
+			"metadata": "URI to storage account containing linked ARM templates"
+		},
+		"containerSasToken": {
+			"type": "string",
+			"metadata": "Sas token to storage account containing linked ARM templates"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "OPHACK-MDW-Team10-ADF_ArmTemplate_0",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_0.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					},
+					"AzureDataLakeStorage_Team10_accountKey": {
+						"value": "[parameters('AzureDataLakeStorage_Team10_accountKey')]"
+					},
+					"AzureSqlDatabase_CloudSales_connectionString": {
+						"value": "[parameters('AzureSqlDatabase_CloudSales_connectionString')]"
+					},
+					"AzureSqlDatabase_CloudStreaming_connectionString": {
+						"value": "[parameters('AzureSqlDatabase_CloudStreaming_connectionString')]"
+					},
+					"CosmosDB_Movies_connectionString": {
+						"value": "[parameters('CosmosDB_Movies_connectionString')]"
+					},
+					"FourthCoffee_Directory_password": {
+						"value": "[parameters('FourthCoffee_Directory_password')]"
+					},
+					"VanArsdelLtd_connectionString": {
+						"value": "[parameters('VanArsdelLtd_connectionString')]"
+					},
+					"AzureDataLakeStorage_Team10_properties_typeProperties_url": {
+						"value": "[parameters('AzureDataLakeStorage_Team10_properties_typeProperties_url')]"
+					},
+					"ircsvfiles_properties_typeProperties_linkedInfo_resourceId": {
+						"value": "[parameters('ircsvfiles_properties_typeProperties_linkedInfo_resourceId')]"
+					},
+					"ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId": {
+						"value": "[parameters('ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId')]"
+					},
+					"FourthCoffee_Directory_properties_typeProperties_host": {
+						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_host')]"
+					},
+					"FourthCoffee_Directory_properties_typeProperties_userId": {
+						"value": "[parameters('FourthCoffee_Directory_properties_typeProperties_userId')]"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "OPHACK-MDW-Team10-ADF_ArmTemplate_1",
+			"type": "Microsoft.Resources/deployments",
+			"apiVersion": "2018-02-01",
+			"properties": {
+				"mode": "incremental",
+				"templateLink": {
+					"uri": "[concat(parameters('containerUri'), '/ArmTemplate_1.json', parameters('containerSasToken'))]",
+					"contentVersion": "1.0.0.0"
+				},
+				"parameters": {
+					"factoryName": {
+						"value": "[parameters('factoryName')]"
+					}
+				}
+			},
+			"dependsOn": [
+				"[resourceId('Microsoft.Resources/deployments', 'OPHACK-MDW-Team10-ADF_ArmTemplate_0')]"
+			]
+		}
+	]
+}

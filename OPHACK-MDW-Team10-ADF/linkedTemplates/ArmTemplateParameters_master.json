@@ -1,0 +1,48 @@
+{
+	"$schema": "https://schema.management.azure.com/schemas/2015-01-01/deploymentParameters.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"value": "OPHACK-MDW-Team10-ADF"
+		},
+		"AzureDataLakeStorage_Team10_accountKey": {
+			"value": ""
+		},
+		"AzureSqlDatabase_CloudSales_connectionString": {
+			"value": ""
+		},
+		"AzureSqlDatabase_CloudStreaming_connectionString": {
+			"value": ""
+		},
+		"CosmosDB_Movies_connectionString": {
+			"value": ""
+		},
+		"FourthCoffee_Directory_password": {
+			"value": ""
+		},
+		"VanArsdelLtd_connectionString": {
+			"value": ""
+		},
+		"AzureDataLakeStorage_Team10_properties_typeProperties_url": {
+			"value": "https://ophackmdwteam10stgacc.dfs.core.windows.net"
+		},
+		"FourthCoffee_Directory_properties_typeProperties_host": {
+			"value": "C:\\"
+		},
+		"FourthCoffee_Directory_properties_typeProperties_userId": {
+			"value": "openhackadmin"
+		},
+		"ircsvfiles_properties_typeProperties_linkedInfo_resourceId": {
+			"value": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/IRCSV"
+		},
+		"ironpremsqlserver_properties_typeProperties_linkedInfo_resourceId": {
+			"value": "/subscriptions/94dd9f4a-5e67-44a9-a01b-ae1e17a4d021/resourcegroups/OPHACK-MDW-Team10/providers/Microsoft.DataFactory/factories/team10df/integrationruntimes/integrationRuntime"
+		},
+		"containerUri": {
+			"value": ""
+		},
+		"containerSasToken": {
+			"value": ""
+		}
+	}
+}

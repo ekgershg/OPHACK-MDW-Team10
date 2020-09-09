@@ -1,0 +1,917 @@
+{
+	"$schema": "http://schema.management.azure.com/schemas/2015-01-01/deploymentTemplate.json#",
+	"contentVersion": "1.0.0.0",
+	"parameters": {
+		"factoryName": {
+			"type": "string",
+			"metadata": "Data Factory name",
+			"defaultValue": "OPHACK-MDW-Team10-ADF"
+		}
+	},
+	"variables": {
+		"factoryId": "[concat('Microsoft.DataFactory/factories/', parameters('factoryName'))]"
+	},
+	"resources": [
+		{
+			"name": "[concat(parameters('factoryName'), '/Customersvanarsdelsqlserver')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.parquet",
+						"fileSystem": "vanarsdelsqlserver"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "ActorID",
+						"type": "UTF8"
+					},
+					{
+						"name": "ActorName",
+						"type": "UTF8"
+					},
+					{
+						"name": "Gender",
+						"type": "UTF8"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerFourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "DelimitedText",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "Customers.csv",
+						"fileSystem": "fourthcoffeecsv"
+					},
+					"columnDelimiter": ",",
+					"escapeChar": "\\",
+					"firstRowAsHeader": true,
+					"quoteChar": "\""
+				},
+				"schema": [
+					{
+						"name": "CustomerID",
+						"type": "String"
+					},
+					{
+						"name": "LastName",
+						"type": "String"
+					},
+					{
+						"name": "FirstName",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine1",
+						"type": "String"
+					},
+					{
+						"name": "AddressLine2",
+						"type": "String"
+					},
+					{
+						"name": "City",
+						"type": "String"
+					},
+					{
+						"name": "State",
+						"type": "String"
+					},
+					{
+						"name": "ZipCode",
+						"type": "String"
+					},
+					{
+						"name": "PhoneNumber",
+						"type": "String"
+					},
+					{
+						"name": "CreatedDate",
+						"type": "String"
+					},
+					{
+						"name": "UpdatedDate",
+						"type": "String"
+					}
+				]
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomersWithAddresses')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "4-customers-with-addresses"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/trgCustomersWithAddresses')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileSystem": "4-customers-with-addresses"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": []
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_CloudSalesAzureSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "CloudSales Azure SQL to ADL",
+				"activities": [
+					{
+						"name": "ForEach_dzb",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_dzb",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "cloudsalesazuresql//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"partitionOption": {
+												"value": "@item().copySource.partitionOption",
+												"type": "Expression"
+											},
+											"partitionSettings": {}
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"validateDataConsistency": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_dzb",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_dzb",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "Addresses"
+								},
+								"destination": {
+									"fileName": "Addresses.parquet"
+								},
+								"copySource": {
+									"partitionOption": "None"
+								}
+							},
+							{
+								"source": {
+									"table": "Customers"
+								},
+								"destination": {
+									"fileName": "Customers.parquet"
+								},
+								"copySource": {
+									"partitionOption": "None"
+								}
+							},
+							{
+								"source": {
+									"table": "OrderDetails"
+								},
+								"destination": {
+									"fileName": "OrderDetails.parquet"
+								},
+								"copySource": {
+									"partitionOption": "None"
+								}
+							},
+							{
+								"source": {
+									"table": "Orders"
+								},
+								"destination": {
+									"fileName": "Orders.parquet"
+								},
+								"copySource": {
+									"partitionOption": "PhysicalPartitionsOfTable"
+								}
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T18:36:04Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_CloudStreamingAzureSQL')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "CloudStreaming Azure SQL to ADL",
+				"activities": [
+					{
+						"name": "ForEach_zc3",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_zc3",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "cloudstreamingazuresql//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "AzureSqlSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"validateDataConsistency": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_zc3",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_zc3",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "Addresses"
+								},
+								"destination": {
+									"fileName": "Addresses.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Customers"
+								},
+								"destination": {
+									"fileName": "Customers.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Transactions"
+								},
+								"destination": {
+									"fileName": "Transactions.parquet"
+								}
+							}
+						]
+					}
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T18:37:57Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_CosmosDBCollection')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "CosmosDB Collection to ADL",
+				"activities": [
+					{
+						"name": "Copy_ikj",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "movies"
+							},
+							{
+								"name": "Destination",
+								"value": "cosmosdbmovies//movies.json"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "CosmosDbSqlApiSource",
+								"preferredRegions": []
+							},
+							"sink": {
+								"type": "JsonSink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								},
+								"formatSettings": {
+									"type": "JsonWriteSettings",
+									"filePattern": "setOfObjects"
+								}
+							},
+							"enableStaging": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_ikj",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_ikj",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T18:40:27Z"
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_fgc')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffee_Directory",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Copy_FourthCoffee"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "*.csv",
+						"folderPath": "Rentals"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_sw9')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "VanArsdelLtd",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Copy_VanArsdelLtd"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerswithAddresses')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CustomersCloudSales",
+								"type": "DatasetReference"
+							},
+							"name": "Customerscloudsalesazure"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustoimersCloudStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "Customerscloudstreamingazure"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressesCloudSales",
+								"type": "DatasetReference"
+							},
+							"name": "AddresseCloudSalesAzure"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressesCloudStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "AddressesCloudStreaming"
+						},
+						{
+							"dataset": {
+								"referenceName": "Customersvanarsdelsqlserver",
+								"type": "DatasetReference"
+							},
+							"name": "Customersvanarsdelsqlserver"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustomerFourthCoffee",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerFourthCoffee"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "trgCustomersWithAddresses",
+								"type": "DatasetReference"
+							},
+							"name": "trgCustomersWithAddresses"
+						}
+					],
+					"transformations": [
+						{
+							"name": "CloudSales"
+						},
+						{
+							"name": "CloudStreaming"
+						},
+						{
+							"name": "DerivedColumnCloudSales"
+						},
+						{
+							"name": "DerivedColumnCloudStreaming"
+						},
+						{
+							"name": "DerivedColumnVanarsdelSQL"
+						},
+						{
+							"name": "DerivedColumnFourthCofee"
+						},
+						{
+							"name": "SelectCloudStreaming"
+						},
+						{
+							"name": "SelectCloudSales"
+						},
+						{
+							"name": "UnionSaleswithStream"
+						},
+						{
+							"name": "SelectVanarsdel"
+						},
+						{
+							"name": "SelectFourthCoffee"
+						},
+						{
+							"name": "UnionVanArsdelwithFourthCoffee"
+						},
+						{
+							"name": "UnionCustomerWithAddresses"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customerscloudsalesazure\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customerscloudstreamingazure\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> AddresseCloudSalesAzure\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> AddressesCloudStreaming\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customersvanarsdelsqlserver\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> CustomerFourthCoffee\nCustomerscloudsalesazure, AddresseCloudSalesAzure join(Customerscloudsalesazure@CustomerID == AddresseCloudSalesAzure@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CloudSales\nCustomerscloudstreamingazure, AddressesCloudStreaming join(Customerscloudstreamingazure@CustomerID == AddressesCloudStreaming@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CloudStreaming\nCloudSales derive(Source = 1,\n\t\tUID = uuid()) ~> DerivedColumnCloudSales\nCloudStreaming derive(Source = 2,\n\t\tUID = uuid()) ~> DerivedColumnCloudStreaming\nCustomersvanarsdelsqlserver derive(Source = 3,\n\t\tUID = uuid(),\n\t\tcrDate = substring(toString(CreatedDate,'YYYY-MM-DD'),1,10)\r\n,\n\t\tupDate = substring(toString(UpdatedDate,'YYYY-MM-DD'),1,10)) ~> DerivedColumnVanarsdelSQL\nCustomerFourthCoffee derive(Source = 4,\n\t\tUID = uuid(),\n\t\tcrDate = toString(CreatedDate,'YYYY-MM-DD'),\n\t\tupDate = toString(UpdatedDate,'YYYY-MM-DD')) ~> DerivedColumnFourthCofee\nDerivedColumnCloudStreaming select(mapColumn(\n\t\tCustomerID = Customerscloudstreamingazure@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate_Cust = Customerscloudstreamingazure@CreatedDate,\n\t\tUpdatedDate_Cust = Customerscloudstreamingazure@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tCreatedDate_Add = AddressesCloudStreaming@CreatedDate,\n\t\tUpdatedDate_Add = AddressesCloudStreaming@UpdatedDate,\n\t\tSource,\n\t\tUID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCloudStreaming\nDerivedColumnCloudSales select(mapColumn(\n\t\tCustomerID = Customerscloudsalesazure@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate_Cust = Customerscloudsalesazure@CreatedDate,\n\t\tUpdatedDate_Cust = Customerscloudsalesazure@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tCreatedDate_Add = AddresseCloudSalesAzure@CreatedDate,\n\t\tUpdatedDate_Add = AddresseCloudSalesAzure@UpdatedDate,\n\t\tSource,\n\t\tUID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCloudSales\nSelectCloudSales, SelectCloudStreaming union(byName: true)~> UnionSaleswithStream\nDerivedColumnVanarsdelSQL select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tPhoneNumber,\n\t\tSource,\n\t\tUID,\n\t\tcrDate,\n\t\tupDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectVanarsdel\nDerivedColumnFourthCofee select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tPhoneNumber,\n\t\tSource,\n\t\tUID,\n\t\tcrDate,\n\t\tupDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectFourthCoffee\nSelectVanarsdel, SelectFourthCoffee union(byName: true)~> UnionVanArsdelwithFourthCoffee\nUnionSaleswithStream, UnionVanArsdelwithFourthCoffee union(byName: true)~> UnionCustomerWithAddresses\nUnionCustomerWithAddresses sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> trgCustomersWithAddresses"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Customersvanarsdelsqlserver')]",
+				"[concat(variables('factoryId'), '/datasets/CustomerFourthCoffee')]",
+				"[concat(variables('factoryId'), '/datasets/trgCustomersWithAddresses')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_FourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Fourth Coffee CSV to ADL",
+				"activities": [
+					{
+						"name": "Copy_fgc",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "Rentals/*.csv"
+							},
+							{
+								"name": "Destination",
+								"value": "fourthcoffeecsv//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_fgc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_fgc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T19:18:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_fgc')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_VanArsdelLtd')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "VanArsdel Resources to ADL",
+				"activities": [
+					{
+						"name": "ForEach_sw9",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_sw9",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "vanarsdelsqlserver//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"validateDataConsistency": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_sw9",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_sw9",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "Actors"
+								},
+								"destination": {
+									"fileName": "Actors.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Customers"
+								},
+								"destination": {
+									"fileName": "Customers.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "MovieActors"
+								},
+								"destination": {
+									"fileName": "MovieActors.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Movies"
+								},
+								"destination": {
+									"fileName": "Movies.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "OnlineMovieMappings"
+								},
+								"destination": {
+									"fileName": "OnlineMovieMappings.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Transactions"
+								},
+								"destination": {
+									"fileName": "Transactions.parquet"
+								}
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T19:32:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_sw9')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Customers with addresses')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "dataflow1",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "CustomerswithAddresses",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Customerscloudsalesazure": {},
+									"Customerscloudstreamingazure": {},
+									"AddresseCloudSalesAzure": {},
+									"AddressesCloudStreaming": {},
+									"Customersvanarsdelsqlserver": {},
+									"CustomerFourthCoffee": {},
+									"trgCustomersWithAddresses": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/CustomerswithAddresses')]"
+			]
+		}
+	]
+}
