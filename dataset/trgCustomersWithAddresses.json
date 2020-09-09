@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "CustomersWithAddresses.parquet",
 				"fileSystem": "4-customers-with-addresses"
 			},
 			"compressionCodec": "snappy"
