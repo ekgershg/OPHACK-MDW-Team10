@@ -1,0 +1,24 @@
+{
+	"name": "DimCustomers",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "trgCustomersWithAddresses",
+						"type": "DatasetReference"
+					},
+					"name": "Customers"
+				}
+			],
+			"sinks": [],
+			"transformations": [
+				{
+					"name": "DimCustomers"
+				}
+			],
+			"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate_Cust as date,\n\t\tUpdatedDate_Cust as date,\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate_Add as date,\n\t\tUpdatedDate_Add as date,\n\t\tSource as integer,\n\t\tUID as string,\n\t\tcrDate as string,\n\t\tupDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customers\nCustomers select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate_Cust,\n\t\tUpdatedDate_Cust,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tCreatedDate_Add,\n\t\tUpdatedDate_Add,\n\t\tSource,\n\t\tUID,\n\t\tcrDate,\n\t\tupDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimCustomers"
+		}
+	}
+}
