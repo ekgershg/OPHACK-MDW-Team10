@@ -1,0 +1,19 @@
+{
+	"name": "SinkStreamingTransactions",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileSystem": "2-streaming-transactions"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

@@ -1,0 +1,32 @@
+{
+	"name": "StreamingTransactions",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "StreamingTransactions",
+						"type": "DatasetReference"
+					},
+					"name": "StreamingTransactions"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "SinkStreamingTransactions",
+						"type": "DatasetReference"
+					},
+					"name": "sinkStreamingTransactions"
+				}
+			],
+			"transformations": [
+				{
+					"name": "DerivedColumnStreaming"
+				}
+			],
+			"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransactions\nStreamingTransactions derive(Source = 2,\n\t\tUID = uuid()) ~> DerivedColumnStreaming\nDerivedColumnStreaming sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkStreamingTransactions"
+		}
+	}
+}
