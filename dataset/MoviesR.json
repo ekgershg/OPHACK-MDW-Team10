@@ -10,7 +10,7 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "part-00000-tid-1439298966333000294-637c06cb-91e7-49d5-8d4a-df7afadf6c04-5-1-c000.parquet",
+				"fileName": "part-00000-tid-7107429677284965499-258b9dab-1d50-4d9a-a376-495880577d47-7-1-c000.parquet",
 				"fileSystem": "test"
 			},
 			"compressionCodec": "snappy"
