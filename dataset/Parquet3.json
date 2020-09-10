@@ -1,0 +1,20 @@
+{
+	"name": "Parquet3",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "Movies2",
+				"fileSystem": "cosmosdbmovies"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": []
+	}
+}

@@ -1,0 +1,29 @@
+{
+	"name": "WranglingDataFlow2",
+	"properties": {
+		"type": "WranglingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"name": "Parquet2",
+					"script": "",
+					"dataset": {
+						"referenceName": "Parquet2",
+						"type": "DatasetReference"
+					}
+				}
+			],
+			"sinks": [
+				{
+					"name": "Sink1",
+					"dataset": {
+						"referenceName": "Parquet3",
+						"type": "DatasetReference"
+					},
+					"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink1"
+				}
+			],
+			"script": "section Section1;\r\nshared Parquet2 = let\r\n  AdfDoc = AzureStorage.DataLakeContents(\"https://ophackmdwteam10stgacc.dfs.core.windows.net/cosmosdbmovies/Movies\"),\r\n  Parquet = Parquet.Document(AdfDoc)\r\nin\r\n  Parquet;\r\nshared UserQuery = let\r\n  Source = Parquet2,\r\n  #\"Filtered rows\" = Table.SelectRows(Source, each [id] <> null and [id] <> \"\")\r\nin\r\n  #\"Filtered rows\";\r\n"
+		}
+	}
+}
