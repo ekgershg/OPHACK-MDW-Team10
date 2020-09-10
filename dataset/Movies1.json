@@ -1,0 +1,81 @@
+{
+	"name": "Movies1",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-7107429677284965499-258b9dab-1d50-4d9a-a376-495880577d47-7-1-c000.parquet",
+				"fileSystem": "test"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "name",
+				"type": "UTF8"
+			},
+			{
+				"name": "availabilityDate",
+				"type": "UTF8"
+			},
+			{
+				"name": "genre",
+				"type": "UTF8"
+			},
+			{
+				"name": "rating",
+				"type": "UTF8"
+			},
+			{
+				"name": "releaseYear",
+				"type": "INT64"
+			},
+			{
+				"name": "runtime",
+				"type": "INT64"
+			},
+			{
+				"name": "streamingAvailabilityDate",
+				"type": "UTF8"
+			},
+			{
+				"name": "tier",
+				"type": "INT64"
+			},
+			{
+				"name": "title",
+				"type": "UTF8"
+			},
+			{
+				"name": "id",
+				"type": "UTF8"
+			},
+			{
+				"name": "_rid",
+				"type": "UTF8"
+			},
+			{
+				"name": "_self",
+				"type": "UTF8"
+			},
+			{
+				"name": "_etag",
+				"type": "UTF8"
+			},
+			{
+				"name": "_attachments",
+				"type": "UTF8"
+			},
+			{
+				"name": "_ts",
+				"type": "INT64"
+			}
+		]
+	}
+}

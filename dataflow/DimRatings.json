@@ -6,7 +6,7 @@
 			"sources": [
 				{
 					"dataset": {
-						"referenceName": "Movies",
+						"referenceName": "Movies1",
 						"type": "DatasetReference"
 					},
 					"name": "Movies"
@@ -32,7 +32,7 @@
 					"name": "ConvertionMoviRatingSK"
 				}
 			],
-			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false) ~> Movies\nMovies select(mapColumn(\n\t\trating\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Ratings\nRatings keyGenerate(output(MovieRatingSK as integer),\n\tstartAt: 1L) ~> MovieRatingSK\nMovieRatingSK derive(MovieRatingSK = toInteger(MovieRatingSK)) ~> ConvertionMoviRatingSK\nConvertionMoviRatingSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\trating,\n\t\tMovieRatingSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimRatings"
+			"script": "source(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Movies\nMovies select(mapColumn(\n\t\trating\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Ratings\nRatings keyGenerate(output(MovieRatingSK as integer),\n\tstartAt: 1L) ~> MovieRatingSK\nMovieRatingSK derive(MovieRatingSK = toInteger(MovieRatingSK)) ~> ConvertionMoviRatingSK\nConvertionMoviRatingSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tMovieRatingSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimRatings"
 		}
 	}
 }
