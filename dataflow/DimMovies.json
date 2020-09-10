@@ -17,6 +17,13 @@
 						"type": "DatasetReference"
 					},
 					"name": "DimRatings"
+				},
+				{
+					"dataset": {
+						"referenceName": "DimCategory",
+						"type": "DatasetReference"
+					},
+					"name": "DimCategory"
 				}
 			],
 			"sinks": [
@@ -42,13 +49,13 @@
 					"name": "SelectMoviesCategory"
 				},
 				{
-					"name": "MovieCategorySK"
+					"name": "AllColumnsSK"
 				},
 				{
-					"name": "AllColumnsSK"
+					"name": "Category"
 				}
 			],
-			"script": "source(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> MoviesTitle\nsource(output(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimRatings\nMoviesTitle select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin = runtime,\n\t\trating\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMovies\nRatings keyGenerate(output(MovieSK as long),\n\tstartAt: 1L) ~> MovieSK\nSelectMovies, DimRatings join(rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Ratings\nMovieCategorySK select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin,\n\t\trating,\n\t\tMovieRatingSK,\n\t\tMovieRatingDescription,\n\t\tMovieSK,\n\t\tMovieCategorySK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoviesCategory\nMovieSK keyGenerate(output(MovieCategorySK as long),\n\tstartAt: 1L) ~> MovieCategorySK\nSelectMoviesCategory derive(MovieSK = toInteger(MovieSK),\n\t\tMovieCategorySK = toInteger(MovieCategorySK),\n\t\tmovieruntimemin = toInteger(movieruntimemin)) ~> AllColumnsSK\nAllColumnsSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimMovies"
+			"script": "source(output(\n\t\t{_attachments} as string,\n\t\t{_etag} as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_ts} as integer,\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as timestamp,\n\t\tgenre as string,\n\t\tid as string,\n\t\trating as string,\n\t\treleaseYear as short,\n\t\truntime as short,\n\t\tstreamingAvailabilityDate as timestamp,\n\t\ttier as short,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> MoviesTitle\nsource(output(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimRatings\nsource(output(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCategory\nMoviesTitle select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin = runtime,\n\t\trating,\n\t\tgenre = genre\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMovies\nCategory keyGenerate(output(MovieSK as long),\n\tstartAt: 1L) ~> MovieSK\nSelectMovies, DimRatings join(rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Ratings\nMovieSK select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin,\n\t\trating,\n\t\tMovieRatingSK,\n\t\tMovieRatingDescription,\n\t\tMovieSK,\n\t\tMovieCategorySK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoviesCategory\nSelectMoviesCategory derive(MovieSK = toInteger(MovieSK),\n\t\tmovieruntimemin = toInteger(movieruntimemin)) ~> AllColumnsSK\nRatings, DimCategory join(genre == MovieCategoryDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Category\nAllColumnsSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimMovies"
 		}
 	}
 }
