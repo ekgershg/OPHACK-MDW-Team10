@@ -23,7 +23,7 @@
 					"script": "sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Sink1"
 				}
 			],
-			"script": "section Section1;\r\nshared Parquet4 = let\r\n  AdfDoc = AzureStorage.DataLakeContents(\"https://ophackmdwteam10stgacc.dfs.core.windows.net/test/part-00000-tid-1439298966333000294-637c06cb-91e7-49d5-8d4a-df7afadf6c04-5-1-c000.parquet\"),\r\n  Parquet = Parquet.Document(AdfDoc)\r\nin\r\n  Parquet;\r\nshared UserQuery = let\r\n  Source = Parquet4,\r\n  #\"Filtered rows\" = Table.SelectRows(Source, each [id] = null or [id] = \"\")\r\nin\r\n  #\"Filtered rows\";\r\n"
+			"script": "section Section1;\r\nshared Parquet4 = let\r\n  AdfDoc = AzureStorage.DataLakeContents(\"https://ophackmdwteam10stgacc.dfs.core.windows.net/test/part-00000-tid-1439298966333000294-637c06cb-91e7-49d5-8d4a-df7afadf6c04-5-1-c000.parquet\"),\r\n  Parquet = Parquet.Document(AdfDoc)\r\nin\r\n  Parquet;\r\nshared UserQuery = let\r\n  Source = Parquet4,\r\n  #\"Filtered rows\" = Table.SelectRows(Source, each [id] <> null and [id] <> \"\")\r\nin\r\n  #\"Filtered rows\";\r\n"
 		}
 	}
 }
