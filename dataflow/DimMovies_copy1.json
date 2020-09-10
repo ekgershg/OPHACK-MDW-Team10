@@ -1,0 +1,47 @@
+{
+	"name": "DimMovies_copy1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "CosmosDb",
+						"type": "DatasetReference"
+					},
+					"name": "MoviesTitle"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "DimMovies",
+						"type": "DatasetReference"
+					},
+					"name": "DimMovies"
+				}
+			],
+			"transformations": [
+				{
+					"name": "SelectMovies"
+				},
+				{
+					"name": "MovieSK"
+				},
+				{
+					"name": "Ratings"
+				},
+				{
+					"name": "SelectMoviesCategory"
+				},
+				{
+					"name": "AllColumnsSK"
+				},
+				{
+					"name": "Category"
+				}
+			],
+			"script": "source(output(\n\t\tactors as (name as string)[],\n\t\tavailabilityDate as string,\n\t\tgenre as string,\n\t\trating as string,\n\t\treleaseYear as string,\n\t\truntime as string,\n\t\tstreamingAvailabilityDate as string,\n\t\ttier as string,\n\t\ttitle as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'document') ~> MoviesTitle\nMoviesTitle select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin = runtime,\n\t\trating,\n\t\tgenre\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMovies\nCategory keyGenerate(output(MovieSK as long),\n\tstartAt: 1L) ~> MovieSK\nSelectMovies join(rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Ratings\nMovieSK select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin,\n\t\trating,\n\t\tMovieRatingSK,\n\t\tMovieRatingDescription,\n\t\tMovieSK,\n\t\tMovieCategorySK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoviesCategory\nSelectMoviesCategory derive(MovieSK = toInteger(MovieSK),\n\t\tmovieruntimemin = toInteger(movieruntimemin)) ~> AllColumnsSK\nRatings join(genre == MovieCategoryDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Category\nAllColumnsSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimMovies"
+		}
+	}
+}
