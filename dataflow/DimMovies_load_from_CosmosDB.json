@@ -1,5 +1,5 @@
 {
-	"name": "DimMovies_copy1",
+	"name": "DimMovies_load_from_CosmosDB",
 	"properties": {
 		"type": "MappingDataFlow",
 		"typeProperties": {
