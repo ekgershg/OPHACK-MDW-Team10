@@ -13,6 +13,676 @@
 	},
 	"resources": [
 		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_fgc')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "FourthCoffee_Directory",
+					"type": "LinkedServiceReference"
+				},
+				"folder": {
+					"name": "Copy_FourthCoffee"
+				},
+				"annotations": [],
+				"type": "Binary",
+				"typeProperties": {
+					"location": {
+						"type": "FileServerLocation",
+						"fileName": "*.csv",
+						"folderPath": "Rentals"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/SourceDataset_sw9')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "VanArsdelLtd",
+					"type": "LinkedServiceReference"
+				},
+				"parameters": {
+					"cw_table": {
+						"type": "String"
+					}
+				},
+				"folder": {
+					"name": "Copy_VanArsdelLtd"
+				},
+				"annotations": [],
+				"type": "SqlServerTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": {
+						"value": "@dataset().cw_table",
+						"type": "Expression"
+					}
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CustomerswithAddresses')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "CustomersCloudSales",
+								"type": "DatasetReference"
+							},
+							"name": "Customerscloudsalesazure"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustoimersCloudStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "Customerscloudstreamingazure"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressesCloudSales",
+								"type": "DatasetReference"
+							},
+							"name": "AddresseCloudSalesAzure"
+						},
+						{
+							"dataset": {
+								"referenceName": "AddressesCloudStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "AddressesCloudStreaming"
+						},
+						{
+							"dataset": {
+								"referenceName": "Customersvanarsdelsqlserver",
+								"type": "DatasetReference"
+							},
+							"name": "Customersvanarsdelsqlserver"
+						},
+						{
+							"dataset": {
+								"referenceName": "CustomerFourthCoffee",
+								"type": "DatasetReference"
+							},
+							"name": "CustomerFourthCoffee"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "trgCustomersWithAddresses",
+								"type": "DatasetReference"
+							},
+							"name": "trgCustomersWithAddresses"
+						}
+					],
+					"transformations": [
+						{
+							"name": "CloudSales"
+						},
+						{
+							"name": "CloudStreaming"
+						},
+						{
+							"name": "DerivedColumnCloudSales"
+						},
+						{
+							"name": "DerivedColumnCloudStreaming"
+						},
+						{
+							"name": "DerivedColumnVanarsdelSQL"
+						},
+						{
+							"name": "DerivedColumnFourthCofee"
+						},
+						{
+							"name": "SelectCloudStreaming"
+						},
+						{
+							"name": "SelectCloudSales"
+						},
+						{
+							"name": "UnionSaleswithStream"
+						},
+						{
+							"name": "SelectVanarsdel"
+						},
+						{
+							"name": "SelectFourthCoffee"
+						},
+						{
+							"name": "UnionVanArsdelwithFourthCoffee"
+						},
+						{
+							"name": "UnionCustomerWithAddresses"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customerscloudsalesazure\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customerscloudstreamingazure\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> AddresseCloudSalesAzure\nsource(output(\n\t\tAddressID as string,\n\t\tCustomerID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> AddressesCloudStreaming\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customersvanarsdelsqlserver\nsource(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate as string,\n\t\tUpdatedDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false) ~> CustomerFourthCoffee\nCustomerscloudsalesazure, AddresseCloudSalesAzure join(Customerscloudsalesazure@CustomerID == AddresseCloudSalesAzure@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CloudSales\nCustomerscloudstreamingazure, AddressesCloudStreaming join(Customerscloudstreamingazure@CustomerID == AddressesCloudStreaming@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CloudStreaming\nCloudSales derive(Source = 1,\n\t\tUID = uuid()) ~> DerivedColumnCloudSales\nCloudStreaming derive(Source = 2,\n\t\tUID = uuid()) ~> DerivedColumnCloudStreaming\nCustomersvanarsdelsqlserver derive(Source = 3,\n\t\tUID = uuid(),\n\t\tcrDate = substring(toString(CreatedDate,'YYYY-MM-DD'),1,10),\n\t\tupDate = substring(toString(UpdatedDate,'YYYY-MM-DD'),1,10)) ~> DerivedColumnVanarsdelSQL\nCustomerFourthCoffee derive(Source = 4,\n\t\tUID = uuid(),\n\t\tcrDate = toString(CreatedDate,'YYYY-MM-DD'),\n\t\tupDate = toString(UpdatedDate,'YYYY-MM-DD')) ~> DerivedColumnFourthCofee\nDerivedColumnCloudStreaming select(mapColumn(\n\t\tCustomerID = Customerscloudstreamingazure@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate_Cust = Customerscloudstreamingazure@CreatedDate,\n\t\tUpdatedDate_Cust = Customerscloudstreamingazure@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tCreatedDate_Add = AddressesCloudStreaming@CreatedDate,\n\t\tUpdatedDate_Add = AddressesCloudStreaming@UpdatedDate,\n\t\tSource,\n\t\tUID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCloudStreaming\nDerivedColumnCloudSales select(mapColumn(\n\t\tCustomerID = Customerscloudsalesazure@CustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tCreatedDate_Cust = Customerscloudsalesazure@CreatedDate,\n\t\tUpdatedDate_Cust = Customerscloudsalesazure@UpdatedDate,\n\t\tAddressID,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tCreatedDate_Add = AddresseCloudSalesAzure@CreatedDate,\n\t\tUpdatedDate_Add = AddresseCloudSalesAzure@UpdatedDate,\n\t\tSource,\n\t\tUID\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectCloudSales\nSelectCloudSales, SelectCloudStreaming union(byName: true)~> UnionSaleswithStream\nDerivedColumnVanarsdelSQL select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tPhoneNumber,\n\t\tSource,\n\t\tUID,\n\t\tcrDate,\n\t\tupDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectVanarsdel\nDerivedColumnFourthCofee select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode,\n\t\tPhoneNumber,\n\t\tSource,\n\t\tUID,\n\t\tcrDate,\n\t\tupDate\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectFourthCoffee\nSelectVanarsdel, SelectFourthCoffee union(byName: true)~> UnionVanArsdelwithFourthCoffee\nUnionSaleswithStream, UnionVanArsdelwithFourthCoffee union(byName: true)~> UnionCustomerWithAddresses\nUnionCustomerWithAddresses sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> trgCustomersWithAddresses"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "trgCustomersWithAddresses",
+								"type": "DatasetReference"
+							},
+							"name": "Customers"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "Team10Synapse"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DimCustomers"
+						},
+						{
+							"name": "DimCustomer"
+						},
+						{
+							"name": "CustomerSK"
+						}
+					],
+					"script": "source(output(\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tPhoneNumber as string,\n\t\tCreatedDate_Cust as date,\n\t\tUpdatedDate_Cust as date,\n\t\tAddressID as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tCreatedDate_Add as date,\n\t\tUpdatedDate_Add as date,\n\t\tSource as integer,\n\t\tUID as string,\n\t\tcrDate as string,\n\t\tupDate as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Customers\nCustomers select(mapColumn(\n\t\tCustomerID,\n\t\tLastName,\n\t\tFirstName,\n\t\tPhoneNumber,\n\t\tAddressLine1,\n\t\tAddressLine2,\n\t\tCity,\n\t\tState,\n\t\tZipCode\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimCustomers\nDimCustomers derive(ActiveFlag = true(),\n\t\tRecordStartDate = currentDate()) ~> DimCustomer\nDimCustomer keyGenerate(output(CustomerSK as long),\n\tstartAt: 1L) ~> CustomerSK\nCustomerSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Team10Synapse"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimMovies')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MoviesR",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesTitle"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimRatings",
+								"type": "DatasetReference"
+							},
+							"name": "DimRatings"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimCategory",
+								"type": "DatasetReference"
+							},
+							"name": "DimCategory"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimMovies",
+								"type": "DatasetReference"
+							},
+							"name": "DimMovies"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectMovies"
+						},
+						{
+							"name": "MovieSK"
+						},
+						{
+							"name": "Ratings"
+						},
+						{
+							"name": "SelectMoviesCategory"
+						},
+						{
+							"name": "AllColumnsSK"
+						},
+						{
+							"name": "Category"
+						}
+					],
+					"script": "source(output(\n\t\tname as string,\n\t\tavailabilityDate as string,\n\t\tgenre as string,\n\t\trating as string,\n\t\treleaseYear as long,\n\t\truntime as long,\n\t\tstreamingAvailabilityDate as string,\n\t\ttier as long,\n\t\ttitle as string,\n\t\tid as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_etag} as string,\n\t\t{_attachments} as string,\n\t\t{_ts} as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> MoviesTitle\nsource(output(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimRatings\nsource(output(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCategory\nMoviesTitle select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin = runtime,\n\t\trating,\n\t\tgenre\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMovies\nCategory keyGenerate(output(MovieSK as long),\n\tstartAt: 1L) ~> MovieSK\nSelectMovies, DimRatings join(rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Ratings\nMovieSK select(mapColumn(\n\t\tMovieID = id,\n\t\tMovieTitle = title,\n\t\tmovieruntimemin,\n\t\tMovieRatingSK,\n\t\tMovieSK,\n\t\tMovieCategorySK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoviesCategory\nSelectMoviesCategory derive(MovieSK = toInteger(MovieSK),\n\t\tmovieruntimemin = toInteger(movieruntimemin)) ~> AllColumnsSK\nRatings, DimCategory join(genre == MovieCategoryDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Category\nAllColumnsSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimMovies"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimRatings')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Movies1",
+								"type": "DatasetReference"
+							},
+							"name": "Movies"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimRatings",
+								"type": "DatasetReference"
+							},
+							"name": "DimRatings"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Ratings"
+						},
+						{
+							"name": "MovieRatingSK"
+						},
+						{
+							"name": "ConvertionMoviRatingSK"
+						}
+					],
+					"script": "source(output(\n\t\tname as string,\n\t\tavailabilityDate as string,\n\t\tgenre as string,\n\t\trating as string,\n\t\treleaseYear as long,\n\t\truntime as long,\n\t\tstreamingAvailabilityDate as string,\n\t\ttier as long,\n\t\ttitle as string,\n\t\tid as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_etag} as string,\n\t\t{_attachments} as string,\n\t\t{_ts} as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Movies\nMovies select(mapColumn(\n\t\trating\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Ratings\nRatings keyGenerate(output(MovieRatingSK as integer),\n\tstartAt: 1L) ~> MovieRatingSK\nMovieRatingSK derive(MovieRatingSK = toInteger(MovieRatingSK)) ~> ConvertionMoviRatingSK\nConvertionMoviRatingSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tMovieRatingSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimRatings"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/StreamingTransactions')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "StreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingTransactions"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "SinkStreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "sinkStreamingTransactions"
+						}
+					],
+					"transformations": [
+						{
+							"name": "DerivedColumnStreaming"
+						}
+					],
+					"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransactions\nStreamingTransactions derive(Source = 2,\n\t\tUID = uuid()) ~> DerivedColumnStreaming\nDerivedColumnStreaming sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet',\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> sinkStreamingTransactions"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SinkStreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingTransaction"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomers"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimMovies",
+								"type": "DatasetReference"
+							},
+							"name": "DimMovies"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "FackStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "FactStreaming"
+						}
+					],
+					"transformations": [
+						{
+							"name": "CustomerSK"
+						},
+						{
+							"name": "MoviesSK"
+						},
+						{
+							"name": "StreamingSK"
+						},
+						{
+							"name": "StreamStartDateSK"
+						},
+						{
+							"name": "StreamStartTimeSK"
+						},
+						{
+							"name": "SelectColumns"
+						}
+					],
+					"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date,\n\t\tSource as integer,\n\t\tUID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransaction\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomers\nsource(output(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as short\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimMovies\nStreamingTransaction, DimCustomers join(StreamingTransaction@CustomerID == DimCustomers@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CustomerSK\nCustomerSK, DimMovies join(StreamingTransaction@MovieID == DimMovies@MovieID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> MoviesSK\nSelectColumns keyGenerate(output(StreamingSK as long),\n\tstartAt: 1L) ~> StreamingSK\nStreamingSK keyGenerate(output(StreamStartDateSK as long),\n\tstartAt: 1L) ~> StreamStartDateSK\nStreamStartDateSK keyGenerate(output(StreamStartTimeSK as long),\n\tstartAt: 1L) ~> StreamStartTimeSK\nMoviesSK select(mapColumn(\n\t\tTransactionID,\n\t\tStreamStart,\n\t\tStreamEnd,\n\t\tCreatedDate,\n\t\tUpdatedDate,\n\t\tSource,\n\t\tUID,\n\t\tCustomerSK,\n\t\tMovieSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nStreamStartTimeSK sink(input(\n\t\tStreamingSK as integer,\n\t\tTransactionID as string,\n\t\tCustomerSK as integer,\n\t\tMovieSK as integer,\n\t\tStreamStartDateSK as integer,\n\t\tStreamStartTimeSK as integer,\n\t\tStreamEndDateSK as integer,\n\t\tStreamEndTimeSK as integer,\n\t\tStreamDurationSec as integer,\n\t\tStreamDurationMin as decimal(10,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tStreamingSK,\n\t\tTransactionID,\n\t\tCustomerSK,\n\t\tMovieSK,\n\t\tStreamStartDateSK,\n\t\tStreamStartTimeSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactStreaming"
+				}
+			},
+			"dependsOn": []
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_FourthCoffee')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "Fourth Coffee CSV to ADL",
+				"activities": [
+					{
+						"name": "Copy_fgc",
+						"type": "Copy",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [
+							{
+								"name": "Source",
+								"value": "Rentals/*.csv"
+							},
+							{
+								"name": "Destination",
+								"value": "fourthcoffeecsv//"
+							}
+						],
+						"typeProperties": {
+							"source": {
+								"type": "BinarySource",
+								"storeSettings": {
+									"type": "FileServerReadSettings",
+									"recursive": true,
+									"wildcardFileName": "*",
+									"deleteFilesAfterCompletion": false
+								},
+								"formatSettings": {
+									"type": "BinaryReadSettings"
+								}
+							},
+							"sink": {
+								"type": "BinarySink",
+								"storeSettings": {
+									"type": "AzureBlobFSWriteSettings"
+								}
+							},
+							"enableStaging": false,
+							"enableSkipIncompatibleRow": false,
+							"validateDataConsistency": false
+						},
+						"inputs": [
+							{
+								"referenceName": "SourceDataset_fgc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						],
+						"outputs": [
+							{
+								"referenceName": "DestinationDataset_fgc",
+								"type": "DatasetReference",
+								"parameters": {}
+							}
+						]
+					}
+				],
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T19:18:14Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_fgc')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Copy_VanArsdelLtd')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"description": "VanArsdel Resources to ADL",
+				"activities": [
+					{
+						"name": "ForEach_sw9",
+						"type": "ForEach",
+						"dependsOn": [],
+						"userProperties": [],
+						"typeProperties": {
+							"items": {
+								"value": "@pipeline().parameters.cw_items",
+								"type": "Expression"
+							},
+							"activities": [
+								{
+									"name": "Copy_sw9",
+									"type": "Copy",
+									"dependsOn": [],
+									"policy": {
+										"timeout": "7.00:00:00",
+										"retry": 0,
+										"retryIntervalInSeconds": 30,
+										"secureOutput": false,
+										"secureInput": false
+									},
+									"userProperties": [
+										{
+											"name": "Source",
+											"value": "dbo.@{item().source.table}"
+										},
+										{
+											"name": "Destination",
+											"value": "vanarsdelsqlserver//@{item().destination.fileName}"
+										}
+									],
+									"typeProperties": {
+										"source": {
+											"type": "SqlServerSource",
+											"partitionOption": "None"
+										},
+										"sink": {
+											"type": "ParquetSink",
+											"storeSettings": {
+												"type": "AzureBlobFSWriteSettings"
+											}
+										},
+										"enableStaging": false,
+										"validateDataConsistency": false
+									},
+									"inputs": [
+										{
+											"referenceName": "SourceDataset_sw9",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_table": "@item().source.table"
+											}
+										}
+									],
+									"outputs": [
+										{
+											"referenceName": "DestinationDataset_sw9",
+											"type": "DatasetReference",
+											"parameters": {
+												"cw_fileName": "@item().destination.fileName"
+											}
+										}
+									]
+								}
+							]
+						}
+					}
+				],
+				"parameters": {
+					"cw_items": {
+						"type": "Array",
+						"defaultValue": [
+							{
+								"source": {
+									"table": "Actors"
+								},
+								"destination": {
+									"fileName": "Actors.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Customers"
+								},
+								"destination": {
+									"fileName": "Customers.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "MovieActors"
+								},
+								"destination": {
+									"fileName": "MovieActors.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Movies"
+								},
+								"destination": {
+									"fileName": "Movies.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "OnlineMovieMappings"
+								},
+								"destination": {
+									"fileName": "OnlineMovieMappings.parquet"
+								}
+							},
+							{
+								"source": {
+									"table": "Transactions"
+								},
+								"destination": {
+									"fileName": "Transactions.parquet"
+								}
+							}
+						]
+					}
+				},
+				"folder": {
+					"name": "Copy Pipelines"
+				},
+				"annotations": [],
+				"lastPublishTime": "2020-09-08T19:32:09Z"
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SourceDataset_sw9')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Customers with addresses')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "CustWithAddres",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "CustomerswithAddresses",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Customerscloudsalesazure": {},
+									"Customerscloudstreamingazure": {},
+									"AddresseCloudSalesAzure": {},
+									"AddressesCloudStreaming": {},
+									"Customersvanarsdelsqlserver": {},
+									"CustomerFourthCoffee": {},
+									"trgCustomersWithAddresses": {}
+								}
+							},
+							"staging": {},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/CustomerswithAddresses')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -56,7 +726,157 @@
 				],
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimCustomers')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimMovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimMovies",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimMovies",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"MoviesTitle": {},
+									"DimRatings": {},
+									"DimCategory": {},
+									"DimMovies": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimMovies')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimRatings')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimRatings",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimRatings",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Movies": {},
+									"DimRatings": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimRatings')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactStreaming')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "FactStreaming",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"StreamingTransaction": {},
+									"DimCustomers": {},
+									"DimMovies": {},
+									"FactStreaming": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]"
+			]
 		},
 		{
 			"name": "[concat(parameters('factoryName'), '/Streaming Transactions')]",
@@ -96,7 +916,9 @@
 				],
 				"annotations": []
 			},
-			"dependsOn": []
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/StreamingTransactions')]"
+			]
 		}
 	]
 }

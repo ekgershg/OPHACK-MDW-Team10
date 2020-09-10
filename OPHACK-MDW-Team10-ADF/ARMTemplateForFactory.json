@@ -710,6 +710,157 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DimMovies')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimMovies",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimMovies",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"MoviesTitle": {},
+									"DimRatings": {},
+									"DimCategory": {},
+									"DimMovies": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimMovies')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimRatings')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "DimRatings",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "DimRatings",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"Movies": {},
+									"DimRatings": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/DimRatings')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FactStreaming')]",
+			"type": "Microsoft.DataFactory/factories/pipelines",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"activities": [
+					{
+						"name": "FactStreaming",
+						"type": "ExecuteDataFlow",
+						"dependsOn": [],
+						"policy": {
+							"timeout": "7.00:00:00",
+							"retry": 0,
+							"retryIntervalInSeconds": 30,
+							"secureOutput": false,
+							"secureInput": false
+						},
+						"userProperties": [],
+						"typeProperties": {
+							"dataflow": {
+								"referenceName": "dataflow1",
+								"type": "DataFlowReference",
+								"parameters": {},
+								"datasetParameters": {
+									"StreamingTransaction": {},
+									"DimCustomers": {},
+									"DimMovies": {},
+									"FactStreaming": {}
+								}
+							},
+							"staging": {
+								"linkedService": {
+									"referenceName": "AzureDataLakeStorage_Team10",
+									"type": "LinkedServiceReference"
+								},
+								"folderPath": "2-streaming-transactions"
+							},
+							"compute": {
+								"coreCount": 8,
+								"computeType": "General"
+							}
+						}
+					}
+				],
+				"annotations": []
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/dataflows/dataflow1')]",
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/Streaming Transactions')]",
 			"type": "Microsoft.DataFactory/factories/pipelines",
 			"apiVersion": "2018-06-01",
@@ -857,6 +1008,65 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/CosmosDb')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "CosmosDB_Movies",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "CosmosDbSqlApiCollection",
+				"schema": {
+					"type": "object",
+					"properties": {
+						"actors": {
+							"type": "array",
+							"items": {
+								"type": "object",
+								"properties": {
+									"name": {
+										"type": "string"
+									}
+								}
+							}
+						},
+						"availabilityDate": {
+							"type": "string"
+						},
+						"genre": {
+							"type": "string"
+						},
+						"rating": {
+							"type": "string"
+						},
+						"releaseYear": {
+							"type": "integer"
+						},
+						"runtime": {
+							"type": "integer"
+						},
+						"streamingAvailabilityDate": {
+							"type": "string"
+						},
+						"tier": {
+							"type": "integer"
+						},
+						"title": {
+							"type": "string"
+						}
+					}
+				},
+				"typeProperties": {
+					"collectionName": "movies"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/CosmosDB_Movies')]"
 			]
 		},
 		{
@@ -1255,6 +1465,27 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DimCategory')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimCategories"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/DimCustomers')]",
 			"type": "Microsoft.DataFactory/factories/datasets",
 			"apiVersion": "2018-06-01",
@@ -1273,6 +1504,316 @@
 			},
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimMovies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimMovies"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimRatings')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "DimRatings"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/FackStreaming')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "Team10Synapse",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "AzureSqlDWTable",
+				"schema": [
+					{
+						"name": "StreamingSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "TransactionID",
+						"type": "uniqueidentifier"
+					},
+					{
+						"name": "CustomerSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "MovieSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamStartDateSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamStartTimeSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamEndDateSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamEndTimeSK",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamDurationSec",
+						"type": "int",
+						"precision": 10
+					},
+					{
+						"name": "StreamDurationMin",
+						"type": "decimal",
+						"precision": 10,
+						"scale": 4
+					}
+				],
+				"typeProperties": {
+					"schema": "dbo",
+					"table": "FactStreaming"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/Team10Synapse')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Movies')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Json",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "movies.json",
+						"fileSystem": "cosmosdbmovies"
+					}
+				},
+				"schema": {}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/Movies1')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-7107429677284965499-258b9dab-1d50-4d9a-a376-495880577d47-7-1-c000.parquet",
+						"fileSystem": "test"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "name",
+						"type": "UTF8"
+					},
+					{
+						"name": "availabilityDate",
+						"type": "UTF8"
+					},
+					{
+						"name": "genre",
+						"type": "UTF8"
+					},
+					{
+						"name": "rating",
+						"type": "UTF8"
+					},
+					{
+						"name": "releaseYear",
+						"type": "INT64"
+					},
+					{
+						"name": "runtime",
+						"type": "INT64"
+					},
+					{
+						"name": "streamingAvailabilityDate",
+						"type": "UTF8"
+					},
+					{
+						"name": "tier",
+						"type": "INT64"
+					},
+					{
+						"name": "title",
+						"type": "UTF8"
+					},
+					{
+						"name": "id",
+						"type": "UTF8"
+					},
+					{
+						"name": "_rid",
+						"type": "UTF8"
+					},
+					{
+						"name": "_self",
+						"type": "UTF8"
+					},
+					{
+						"name": "_etag",
+						"type": "UTF8"
+					},
+					{
+						"name": "_attachments",
+						"type": "UTF8"
+					},
+					{
+						"name": "_ts",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/MoviesR')]",
+			"type": "Microsoft.DataFactory/factories/datasets",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"linkedServiceName": {
+					"referenceName": "AzureDataLakeStorage_Team10",
+					"type": "LinkedServiceReference"
+				},
+				"annotations": [],
+				"type": "Parquet",
+				"typeProperties": {
+					"location": {
+						"type": "AzureBlobFSLocation",
+						"fileName": "part-00000-tid-7107429677284965499-258b9dab-1d50-4d9a-a376-495880577d47-7-1-c000.parquet",
+						"fileSystem": "test"
+					},
+					"compressionCodec": "snappy"
+				},
+				"schema": [
+					{
+						"name": "name",
+						"type": "UTF8"
+					},
+					{
+						"name": "availabilityDate",
+						"type": "UTF8"
+					},
+					{
+						"name": "genre",
+						"type": "UTF8"
+					},
+					{
+						"name": "rating",
+						"type": "UTF8"
+					},
+					{
+						"name": "releaseYear",
+						"type": "INT64"
+					},
+					{
+						"name": "runtime",
+						"type": "INT64"
+					},
+					{
+						"name": "streamingAvailabilityDate",
+						"type": "UTF8"
+					},
+					{
+						"name": "tier",
+						"type": "INT64"
+					},
+					{
+						"name": "title",
+						"type": "UTF8"
+					},
+					{
+						"name": "id",
+						"type": "UTF8"
+					},
+					{
+						"name": "_rid",
+						"type": "UTF8"
+					},
+					{
+						"name": "_self",
+						"type": "UTF8"
+					},
+					{
+						"name": "_etag",
+						"type": "UTF8"
+					},
+					{
+						"name": "_attachments",
+						"type": "UTF8"
+					},
+					{
+						"name": "_ts",
+						"type": "INT64"
+					}
+				]
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/linkedServices/AzureDataLakeStorage_Team10')]"
 			]
 		},
 		{
@@ -1863,6 +2404,119 @@
 			]
 		},
 		{
+			"name": "[concat(parameters('factoryName'), '/DimMovies')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "MoviesR",
+								"type": "DatasetReference"
+							},
+							"name": "MoviesTitle"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimRatings",
+								"type": "DatasetReference"
+							},
+							"name": "DimRatings"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimCategory",
+								"type": "DatasetReference"
+							},
+							"name": "DimCategory"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimMovies",
+								"type": "DatasetReference"
+							},
+							"name": "DimMovies"
+						}
+					],
+					"transformations": [
+						{
+							"name": "SelectMovies"
+						},
+						{
+							"name": "MovieSK"
+						},
+						{
+							"name": "Ratings"
+						},
+						{
+							"name": "SelectMoviesCategory"
+						},
+						{
+							"name": "AllColumnsSK"
+						},
+						{
+							"name": "Category"
+						}
+					],
+					"script": "source(output(\n\t\tname as string,\n\t\tavailabilityDate as string,\n\t\tgenre as string,\n\t\trating as string,\n\t\treleaseYear as long,\n\t\truntime as long,\n\t\tstreamingAvailabilityDate as string,\n\t\ttier as long,\n\t\ttitle as string,\n\t\tid as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_etag} as string,\n\t\t{_attachments} as string,\n\t\t{_ts} as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> MoviesTitle\nsource(output(\n\t\tMovieRatingSK as integer,\n\t\tMovieRatingDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimRatings\nsource(output(\n\t\tMovieCategorySK as integer,\n\t\tMovieCategoryDescription as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCategory\nMoviesTitle select(mapColumn(\n\t\tid,\n\t\ttitle,\n\t\tmovieruntimemin = runtime,\n\t\trating,\n\t\tgenre\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMovies\nCategory keyGenerate(output(MovieSK as long),\n\tstartAt: 1L) ~> MovieSK\nSelectMovies, DimRatings join(rating == MovieRatingDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Ratings\nMovieSK select(mapColumn(\n\t\tMovieID = id,\n\t\tMovieTitle = title,\n\t\tmovieruntimemin,\n\t\tMovieRatingSK,\n\t\tMovieSK,\n\t\tMovieCategorySK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectMoviesCategory\nSelectMoviesCategory derive(MovieSK = toInteger(MovieSK),\n\t\tmovieruntimemin = toInteger(movieruntimemin)) ~> AllColumnsSK\nRatings, DimCategory join(genre == MovieCategoryDescription,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> Category\nAllColumnsSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimMovies"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/MoviesR')]",
+				"[concat(variables('factoryId'), '/datasets/DimRatings')]",
+				"[concat(variables('factoryId'), '/datasets/DimCategory')]",
+				"[concat(variables('factoryId'), '/datasets/DimMovies')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/DimRatings')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "Movies1",
+								"type": "DatasetReference"
+							},
+							"name": "Movies"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "DimRatings",
+								"type": "DatasetReference"
+							},
+							"name": "DimRatings"
+						}
+					],
+					"transformations": [
+						{
+							"name": "Ratings"
+						},
+						{
+							"name": "MovieRatingSK"
+						},
+						{
+							"name": "ConvertionMoviRatingSK"
+						}
+					],
+					"script": "source(output(\n\t\tname as string,\n\t\tavailabilityDate as string,\n\t\tgenre as string,\n\t\trating as string,\n\t\treleaseYear as long,\n\t\truntime as long,\n\t\tstreamingAvailabilityDate as string,\n\t\ttier as long,\n\t\ttitle as string,\n\t\tid as string,\n\t\t{_rid} as string,\n\t\t{_self} as string,\n\t\t{_etag} as string,\n\t\t{_attachments} as string,\n\t\t{_ts} as long\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> Movies\nMovies select(mapColumn(\n\t\trating\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> Ratings\nRatings keyGenerate(output(MovieRatingSK as integer),\n\tstartAt: 1L) ~> MovieRatingSK\nMovieRatingSK derive(MovieRatingSK = toInteger(MovieRatingSK)) ~> ConvertionMoviRatingSK\nConvertionMoviRatingSK sink(allowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tMovieRatingSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> DimRatings"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/Movies1')]",
+				"[concat(variables('factoryId'), '/datasets/DimRatings')]"
+			]
+		},
+		{
 			"name": "[concat(parameters('factoryName'), '/StreamingTransactions')]",
 			"type": "Microsoft.DataFactory/factories/dataflows",
 			"apiVersion": "2018-06-01",
@@ -1898,6 +2552,75 @@
 			"dependsOn": [
 				"[concat(variables('factoryId'), '/datasets/StreamingTransactions')]",
 				"[concat(variables('factoryId'), '/datasets/SinkStreamingTransactions')]"
+			]
+		},
+		{
+			"name": "[concat(parameters('factoryName'), '/dataflow1')]",
+			"type": "Microsoft.DataFactory/factories/dataflows",
+			"apiVersion": "2018-06-01",
+			"properties": {
+				"type": "MappingDataFlow",
+				"typeProperties": {
+					"sources": [
+						{
+							"dataset": {
+								"referenceName": "SinkStreamingTransactions",
+								"type": "DatasetReference"
+							},
+							"name": "StreamingTransaction"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimCustomers",
+								"type": "DatasetReference"
+							},
+							"name": "DimCustomers"
+						},
+						{
+							"dataset": {
+								"referenceName": "DimMovies",
+								"type": "DatasetReference"
+							},
+							"name": "DimMovies"
+						}
+					],
+					"sinks": [
+						{
+							"dataset": {
+								"referenceName": "FackStreaming",
+								"type": "DatasetReference"
+							},
+							"name": "FactStreaming"
+						}
+					],
+					"transformations": [
+						{
+							"name": "CustomerSK"
+						},
+						{
+							"name": "MoviesSK"
+						},
+						{
+							"name": "StreamingSK"
+						},
+						{
+							"name": "StreamStartDateSK"
+						},
+						{
+							"name": "StreamStartTimeSK"
+						},
+						{
+							"name": "SelectColumns"
+						}
+					],
+					"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date,\n\t\tSource as integer,\n\t\tUID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransaction\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomers\nsource(output(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as short\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimMovies\nStreamingTransaction, DimCustomers join(StreamingTransaction@CustomerID == DimCustomers@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CustomerSK\nCustomerSK, DimMovies join(StreamingTransaction@MovieID == DimMovies@MovieID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> MoviesSK\nSelectColumns keyGenerate(output(StreamingSK as long),\n\tstartAt: 1L) ~> StreamingSK\nStreamingSK keyGenerate(output(StreamStartDateSK as long),\n\tstartAt: 1L) ~> StreamStartDateSK\nStreamStartDateSK keyGenerate(output(StreamStartTimeSK as long),\n\tstartAt: 1L) ~> StreamStartTimeSK\nMoviesSK select(mapColumn(\n\t\tTransactionID,\n\t\tStreamStart,\n\t\tStreamEnd,\n\t\tCreatedDate,\n\t\tUpdatedDate,\n\t\tSource,\n\t\tUID,\n\t\tCustomerSK,\n\t\tMovieSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> SelectColumns\nStreamStartTimeSK sink(input(\n\t\tStreamingSK as integer,\n\t\tTransactionID as string,\n\t\tCustomerSK as integer,\n\t\tMovieSK as integer,\n\t\tStreamStartDateSK as integer,\n\t\tStreamStartTimeSK as integer,\n\t\tStreamEndDateSK as integer,\n\t\tStreamEndTimeSK as integer,\n\t\tStreamDurationSec as integer,\n\t\tStreamDurationMin as decimal(10,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tStreamingSK,\n\t\tTransactionID,\n\t\tCustomerSK,\n\t\tMovieSK,\n\t\tStreamStartDateSK,\n\t\tStreamStartTimeSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactStreaming"
+				}
+			},
+			"dependsOn": [
+				"[concat(variables('factoryId'), '/datasets/SinkStreamingTransactions')]",
+				"[concat(variables('factoryId'), '/datasets/DimCustomers')]",
+				"[concat(variables('factoryId'), '/datasets/DimMovies')]",
+				"[concat(variables('factoryId'), '/datasets/FackStreaming')]"
 			]
 		}
 	]
