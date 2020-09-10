@@ -1,0 +1,81 @@
+{
+	"name": "Parquet4",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "AzureDataLakeStorage_Team10",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "Parquet",
+		"typeProperties": {
+			"location": {
+				"type": "AzureBlobFSLocation",
+				"fileName": "part-00000-tid-1439298966333000294-637c06cb-91e7-49d5-8d4a-df7afadf6c04-5-1-c000.parquet",
+				"fileSystem": "test"
+			},
+			"compressionCodec": "snappy"
+		},
+		"schema": [
+			{
+				"name": "name",
+				"type": "UTF8"
+			},
+			{
+				"name": "availabilityDate",
+				"type": "UTF8"
+			},
+			{
+				"name": "genre",
+				"type": "UTF8"
+			},
+			{
+				"name": "rating",
+				"type": "UTF8"
+			},
+			{
+				"name": "releaseYear",
+				"type": "INT64"
+			},
+			{
+				"name": "runtime",
+				"type": "INT64"
+			},
+			{
+				"name": "streamingAvailabilityDate",
+				"type": "UTF8"
+			},
+			{
+				"name": "tier",
+				"type": "INT64"
+			},
+			{
+				"name": "title",
+				"type": "UTF8"
+			},
+			{
+				"name": "id",
+				"type": "UTF8"
+			},
+			{
+				"name": "_rid",
+				"type": "UTF8"
+			},
+			{
+				"name": "_self",
+				"type": "UTF8"
+			},
+			{
+				"name": "_etag",
+				"type": "UTF8"
+			},
+			{
+				"name": "_attachments",
+				"type": "UTF8"
+			},
+			{
+				"name": "_ts",
+				"type": "INT64"
+			}
+		]
+	}
+}
