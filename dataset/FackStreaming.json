@@ -1,0 +1,67 @@
+{
+	"name": "FackStreaming",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "Team10Synapse",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureSqlDWTable",
+		"schema": [
+			{
+				"name": "StreamingSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "TransactionID",
+				"type": "uniqueidentifier"
+			},
+			{
+				"name": "CustomerSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "MovieSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamStartDateSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamStartTimeSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamEndDateSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamEndTimeSK",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamDurationSec",
+				"type": "int",
+				"precision": 10
+			},
+			{
+				"name": "StreamDurationMin",
+				"type": "decimal",
+				"precision": 10,
+				"scale": 4
+			}
+		],
+		"typeProperties": {
+			"schema": "dbo",
+			"table": "FactStreaming"
+		}
+	}
+}

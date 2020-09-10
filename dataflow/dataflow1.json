@@ -1,0 +1,58 @@
+{
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "SinkStreamingTransactions",
+						"type": "DatasetReference"
+					},
+					"name": "StreamingTransaction"
+				},
+				{
+					"dataset": {
+						"referenceName": "DimCustomers",
+						"type": "DatasetReference"
+					},
+					"name": "DimCustomers"
+				},
+				{
+					"dataset": {
+						"referenceName": "DimMovies",
+						"type": "DatasetReference"
+					},
+					"name": "DimMovies"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "FackStreaming",
+						"type": "DatasetReference"
+					},
+					"name": "FactStreaming"
+				}
+			],
+			"transformations": [
+				{
+					"name": "CustomerSK"
+				},
+				{
+					"name": "MoviesSK"
+				},
+				{
+					"name": "StreamingSK"
+				},
+				{
+					"name": "StreamStartDateSK"
+				},
+				{
+					"name": "StreamStartTimeSK"
+				}
+			],
+			"script": "source(output(\n\t\tTransactionID as string,\n\t\tCustomerID as string,\n\t\tMovieID as string,\n\t\tStreamStart as timestamp,\n\t\tStreamEnd as timestamp,\n\t\tCreatedDate as date,\n\t\tUpdatedDate as date,\n\t\tSource as integer,\n\t\tUID as string\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tformat: 'parquet') ~> StreamingTransaction\nsource(output(\n\t\tCustomerSK as integer,\n\t\tCustomerID as string,\n\t\tLastName as string,\n\t\tFirstName as string,\n\t\tAddressLine1 as string,\n\t\tAddressLine2 as string,\n\t\tCity as string,\n\t\tState as string,\n\t\tZipCode as string,\n\t\tPhoneNumber as string,\n\t\tRecordStartDate as date,\n\t\tRecordEndDate as date,\n\t\tActiveFlag as boolean\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimCustomers\nsource(output(\n\t\tMovieSK as integer,\n\t\tMovieID as string,\n\t\tMovieTitle as string,\n\t\tMovieCategorySK as integer,\n\t\tMovieRatingSK as integer,\n\t\tMovieRunTimeMin as short\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tisolationLevel: 'READ_UNCOMMITTED',\n\tformat: 'table',\n\tstaged: false) ~> DimMovies\nStreamingTransaction, DimCustomers join(StreamingTransaction@CustomerID == DimCustomers@CustomerID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> CustomerSK\nCustomerSK, DimMovies join(StreamingTransaction@MovieID == DimMovies@MovieID,\n\tjoinType:'inner',\n\tbroadcast: 'auto')~> MoviesSK\nMoviesSK keyGenerate(output(StreamingSK as long),\n\tstartAt: 1L) ~> StreamingSK\nStreamingSK keyGenerate(output(StreamStartDateSK as long),\n\tstartAt: 1L) ~> StreamStartDateSK\nStreamStartDateSK keyGenerate(output(StreamStartTimeSK as long),\n\tstartAt: 1L) ~> StreamStartTimeSK\nStreamStartTimeSK sink(input(\n\t\tStreamingSK as integer,\n\t\tTransactionID as string,\n\t\tCustomerSK as integer,\n\t\tMovieSK as integer,\n\t\tStreamStartDateSK as integer,\n\t\tStreamStartTimeSK as integer,\n\t\tStreamEndDateSK as integer,\n\t\tStreamEndTimeSK as integer,\n\t\tStreamDurationSec as integer,\n\t\tStreamDurationMin as decimal(10,4)\n\t),\n\tallowSchemaDrift: true,\n\tvalidateSchema: false,\n\tdeletable:false,\n\tinsertable:true,\n\tupdateable:false,\n\tupsertable:false,\n\tformat: 'table',\n\tstaged: true,\n\tmapColumn(\n\t\tStreamingSK,\n\t\tTransactionID,\n\t\tCustomerSK,\n\t\tMovieSK,\n\t\tStreamStartDateSK,\n\t\tStreamStartTimeSK\n\t),\n\tskipDuplicateMapInputs: true,\n\tskipDuplicateMapOutputs: true) ~> FactStreaming"
+		}
+	}
+}
