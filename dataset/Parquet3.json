@@ -10,7 +10,6 @@
 		"typeProperties": {
 			"location": {
 				"type": "AzureBlobFSLocation",
-				"fileName": "Movies2",
 				"fileSystem": "cosmosdbmovies"
 			},
 			"compressionCodec": "snappy"
